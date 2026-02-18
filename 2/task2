@@ -1,0 +1,21 @@
+db.sales.aggregate([
+  {
+    $unwind: "$equipment"
+  },
+  {
+    $group: {
+      _id: "$brand",
+      available_options: { $addToSet: "$equipment" }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      brand: "$_id",
+      options: "$available_options"
+    }
+  },
+  {
+    $out: "brands"
+  }
+]);

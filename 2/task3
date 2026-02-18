@@ -1,0 +1,21 @@
+db.dealers.aggregate([
+  {
+    $lookup: {
+      from: "sales",          
+      localField: "name",     
+      foreignField: "owner",  
+      as: "cars"              
+    }
+  },
+  {
+    $project: {
+      name: 1,
+      address: 1,
+      rating: 1, 
+      average_auction_score: { $avg: "$cars.auction_evaluation" }
+    }
+  },
+  {
+    $out: "dealers"
+  }
+]);

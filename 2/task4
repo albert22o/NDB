@@ -1,0 +1,40 @@
+db.dealers.aggregate([
+  {
+    $lookup: {
+      from: "sales",
+      localField: "name",
+      foreignField: "owner",
+      as: "cars"
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      name: 1,
+      address: 1,
+      sanction: {
+        $cond: [
+          { $gt: [{ $size: "$cars" }, 0] }, 
+          { 
+            $divide: [
+              { $size: { $filter: { input: "$cars", as: "c", cond: { $eq: ["$$c.sanctions", true] } } } },
+              { $size: "$cars" }
+            ] 
+          },
+          0 
+        ]
+      }
+    }
+  },
+  {
+    $match: {
+      sanction: { $gt: 0.5 }
+    }
+  },
+  {
+    $project: {
+      name: 1,
+      address: 1
+    }
+  }
+]);

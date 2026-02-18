@@ -1,0 +1,53 @@
+db.sales.aggregate([
+  {
+    $match: {
+      production_date: {
+        $gte: ISODate("2020-01-01"),
+        $lte: ISODate("2021-12-31")
+      }
+    }
+  },
+  {
+    $group: {
+      _id: { 
+        brand: "$brand", 
+        year: { $year: "$production_date" } 
+      },
+      total_sales: { $sum: 1 },
+      total_cost: { $sum: "$cost" }
+    }
+  },
+  {
+    $match: {
+      total_sales: { $gte: 2 }
+    }
+  },
+  {
+    $sort: { total_sales: -1 }
+  },
+  {
+    $project: {
+      _id: 0,
+      название: { 
+        $concat: ["$_id.brand", " ", { $toString: "$_id.year" }] 
+      },
+      "суммарная стоимость": "$total_cost",
+      "рейтинг популярности": {
+        $cond: {
+          if: { $gt: ["$total_sales", 6] },
+          then: "выбор миллионов",
+          else: {
+            $cond: {
+              if: { $gte: ["$total_sales", 4] },
+              then: "популярный",
+              else: "нишевый"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    $out: "stats"
+  }
+]);
