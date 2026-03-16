@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Автомобили</h1>
+
+{% if cars %}
+<table>
+  <tr>
+    <th>Название</th>
+    <th>Марка</th>
+    <th>Цена (₽)</th>
+    <th>На складе</th>
+    <th></th>
+  </tr>
+  {% for car in cars %}
+  <tr>
+    <td>{{ car[1] }}</td>
+    <td>{{ car[2] }}</td>
+    <td>{{ car[3] }}</td>
+    <td>{{ car[4] }}</td>
+    <td><a href="/cars/{{ car[0] }}">Подробнее</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Автомобилей пока нет. <a href="/cars/new">Добавить первый</a>.</p>
+{% endif %}
+{% endblock %}

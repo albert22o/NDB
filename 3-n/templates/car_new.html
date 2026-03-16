@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Добавить авто{% endblock %}
+{% block content %}
+<h1>Добавить автомобиль</h1>
+
+<form method="POST">
+  <label>Название *
+    <input type="text" name="name" maxlength="20" required/>
+  </label>
+  <label>Марка *
+    <input type="text" name="brand" maxlength="20" required/>
+  </label>
+  <label>Описание
+    <textarea name="description"></textarea>
+  </label>
+  <label>Цена (₽) *
+    <input type="number" name="price" min="1" step="0.01" required/>
+  </label>
+  <label>На складе *
+    <input type="number" name="stock" min="0" required/>
+  </label>
+  <button type="submit">Добавить</button>
+  <a href="/">Отмена</a>
+</form>
+{% endblock %}
