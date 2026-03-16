@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Популярные{% endblock %}
+{% block content %}
+<h1>Популярные автомобили</h1>
+
+{% if cars %}
+<table>
+  <tr>
+    <th>#</th>
+    <th>Название</th>
+    <th>Марка</th>
+    <th>Цена (₽)</th>
+    <th>Просмотров</th>
+    <th></th>
+  </tr>
+  {% for car in cars %}
+  <tr>
+    <td>{{ loop.index }}</td>
+    <td>{{ car.name }}</td>
+    <td>{{ car.brand }}</td>
+    <td>{{ car.price }}</td>
+    <td>{{ car.views }}</td>
+    <td><a href="/cars/{{ car.id }}">Подробнее</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Пока никто не смотрел автомобили.</p>
+{% endif %}
+{% endblock %}

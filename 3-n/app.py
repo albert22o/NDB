@@ -3,6 +3,8 @@ from models.db_postgres import get_connection
 from models.db_mongo import comments_collection
 from datetime import datetime
 
+from models.db_redis import r
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -38,6 +40,8 @@ def car_new():
 
 @app.route("/cars/<int:product_id>", methods=["GET", "POST"])
 def car_detail(product_id):
+    r.zincrby("popular:cars", 1, product_id)
+
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("SELECT * FROM cars.cars WHERE id = %s", (product_id,))
@@ -54,10 +58,44 @@ def car_detail(product_id):
             "created_at": datetime.now()
         }
         comments_collection.insert_one(comment)
+        r.delete(f"car:{product_id}:avg_rating")
         return redirect(url_for("car_detail", product_id=product_id))
 
     comments = list(comments_collection.find({"product_id": product_id}))
     return render_template("car_detail.html", car=car, comments=comments)
+
+
+@app.route("/popular")
+def popular():
+    top = r.zrevrange("popular:cars", 0, 9, withscores=True)
+
+    cars = []
+    conn = get_connection()
+    cur = conn.cursor()
+    for car_id, views in top:
+        cur.execute("SELECT id, name, brand, price FROM cars.cars WHERE id = %s", (int(car_id),))
+        row = cur.fetchone()
+        if row:
+            cars.append({"id": row[0], "name": row[1], "brand": row[2],
+                         "price": row[3], "views": int(views)})
+    cur.close()
+    conn.close()
+    return render_template("popular.html", cars=cars)
+
+def get_avg_rating(product_id):
+    key = f"car:{product_id}:avg_rating"
+    cached = r.get(key)
+    if cached is not None:
+        return float(cached)
+
+    comments = list(comments_collection.find({"product_id": product_id}))
+    if comments:
+        avg = sum(c["rating"] for c in comments) / len(comments)
+    else:
+        avg = 0
+
+    r.setex(key, 3600, avg)
+    return round(avg, 1)
 
 @app.route("/search", methods=["GET", "POST"])
 def search():
@@ -78,7 +116,7 @@ def search():
         for car in cars:
             car_comments = list(comments_collection.find({"product_id": car[0]}))
             if car_comments:
-                avg_rating = sum(c["rating"] for c in car_comments) / len(car_comments)
+                avg_rating = get_avg_rating(car[0]);
             else:
                 avg_rating = 0
             if avg_rating >= min_rating:
