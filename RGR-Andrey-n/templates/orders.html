@@ -2,45 +2,60 @@
 
 {% block content %}
     <h2>Оформление новой сделки</h2>
-    <form method="POST" style="margin-bottom: 30px; padding: 15px; background: #e9ecef; border-radius: 5px;">
+    <form method="POST" style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px;">
         <div class="form-group">
             <label>ID Продавца:</label>
-            <input type="number" name="seller_id" required>
+            <input type="number" name="seller_id" placeholder="Например: 1" required>
         </div>
         <div class="form-group">
             <label>ID Объекта (будет помечен как проданный):</label>
-            <input type="number" name="building_id" required>
+            <input type="number" name="building_id" placeholder="Например: 10" required>
         </div>
         <div class="form-group">
             <label>Фактическая цена продажи:</label>
-            <input type="number" step="0.01" name="actual_sell_price" required>
+            <input type="number" step="0.01" name="actual_sell_price" placeholder="Сумма сделки" required>
         </div>
-        <button type="submit">Оформить сделку</button>
+        <button type="submit" style="width: 100%; margin-top: 10px;">Оформить сделку</button>
     </form>
 
     <h2>История сделок</h2>
-    <table>
-        <tr>
-            <th>ID Заказа</th>
-            <th>Время</th>
-            <th>Продавец</th>
-            <th>Район</th>
-            <th>Площадь</th>
-            <th>Цена продажи</th>
-        </tr>
-        {% for o in orders %}
-        <tr>
-            <td>{{ o.order_id }}</td>
-            <td>{{ o.order_time.strftime('%Y-%m-%d %H:%M') if o.order_time else '' }}</td>
-            <td>{{ o.seller_name }}</td>
-            <td>{{ o.district }}</td>
-            <td>{{ o.area }} кв.м</td>
-            <td>{{ o.actual_sell_price }} руб.</td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="6">Сделок пока не было.</td>
-        </tr>
-        {% endfor %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>ID Заказа</th>
+                <th>Время</th>
+                <th>Продавец</th>
+                <th>Район</th>
+                <th>Площадь</th>
+                <th>Цена продажи</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td><strong>#{{ o.order_id }}</strong></td>
+                <td>
+                    {# Проверяем, является ли order_time объектом datetime #}
+                    {% if o.order_time and o.order_time.strftime %}
+                        {{ o.order_time.strftime('%d.%m.%Y %H:%M') }}
+                    {% else %}
+                        {{ o.order_time }}
+                    {% endif %}
+                </td>
+                <td>{{ o.seller_name }}</td>
+                <td>{{ o.district }}</td>
+                <td>{{ o.area }} м²</td>
+                <td style="font-weight: bold; color: #28a745;">{{ "{:,.2f}".format(o.actual_sell_price | float) }} руб.</td>
+            </tr>
+            {% endfor %}
+
+            {% if not orders %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 20px; color: #666;">
+                    Сделок пока не было или данные не загружены.
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
     </table>
 {% endblock %}

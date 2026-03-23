@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Список зарегистрированных продавцов</h2>
+    
+    <p>Ниже представлена информация о партнерах нашего агентства, данные синхронизированы с PostgreSQL и MongoDB.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ФИО Продавца</th>
+                <th>Дата рождения</th>
+                <th>Дата регистрации</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for seller in sellers %}
+            <tr>
+                <td><strong>#{{ seller.seller_id }}</strong></td>
+                <td>{{ seller.full_name }}</td>
+                <td>{{ seller.dob }}</td>
+                <td>
+                    {% if seller.reg_date %}
+                        {{ seller.reg_date }}
+                    {% else %}
+                        <span style="color: #999; font-style: italic;">Не указана</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if not sellers %}
+        <div style="text-align: center; padding: 20px; background: #fff3cd; border-radius: 5px;">
+            Продавцы пока не добавлены в базу данных.
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('add_seller') }}">
+            <button type="button" style="background: #007bff;">+ Добавить нового продавца</button>
+        </a>
+    </div>
+{% endblock %}

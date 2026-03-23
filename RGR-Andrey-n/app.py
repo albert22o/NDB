@@ -24,7 +24,7 @@ def home():
             "sold": row[3],
             "district": row[4],
             "seller_id": row[5],
-            "avg_rating": get_avg_rating(row[0]),  
+            "avg_rating": get_avg_rating(row[0]),
         })
 
     return render_template("index.html", buildings=buildings)
@@ -213,7 +213,7 @@ def get_orders():
                o.actual_sell_price, o."orderTime"
         FROM agents.orders o
         JOIN agents.sellers s ON o.seller_id = s.seller_id
-        JOIN agents.buildings b ON o.building_id = b.building_id
+        JOIN  agents.buildings b ON o.building_id = b.building_id
         ORDER BY o."orderTime" DESC
     """)
     rows = cur.fetchall()
@@ -252,6 +252,25 @@ def get_avg_rating(building_id):
     r.setex(key, 3600, avg)
     return round(avg, 1)
 
+@app.route("/sellers")
+def list_sellers():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT seller_id, "fullName", "dateOfBirth", "dateOfRegistration" FROM agents.sellers')
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    sellers = [
+        {
+            "seller_id": row[0],
+            "full_name": row[1],
+            "dob": row[2],
+            "reg_date": row[3]
+        }
+        for row in rows
+    ]
+    return render_template("sellers.html", sellers=sellers)
 
 if __name__ == '__main__':
     app.run(debug=True)
