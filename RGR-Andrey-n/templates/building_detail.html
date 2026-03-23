@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Объект №{{ building.building_id }} ({{ building.district }})</h2>
+    <ul>
+        <li><strong>Площадь:</strong> {{ building.area }} кв.м</li>
+        <li><strong>Цена:</strong> {{ building.price }} руб.</li>
+        <li><strong>Статус:</strong> {{ 'Продано' if building.sold else 'В продаже' }}</li>
+        <li><strong>ID Продавца:</strong> {{ building.seller_id }}</li>
+    </ul>
+
+    <hr>
+
+    <h3>Отзывы</h3>
+    {% for r in reviews %}
+        <div style="background: #f9f9f9; padding: 10px; margin-bottom: 10px; border-left: 4px solid #007bff;">
+            <strong>{{ r.author }}</strong> (Оценка: {{ r.rating }}/5)<br>
+            <small>{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+            <p>{{ r.text }}</p>
+        </div>
+    {% else %}
+        <p>Отзывов пока нет. Будьте первым!</p>
+    {% endfor %}
+
+    <hr>
+
+    <h3>Оставить отзыв</h3>
+    <form method="POST">
+        <div class="form-group">
+            <label>Имя (необязательно):</label>
+            <input type="text" name="author" placeholder="Аноним">
+        </div>
+        <div class="form-group">
+            <label>Текст отзыва:</label>
+            <textarea name="text" required rows="4"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Оценка (1-5):</label>
+            <input type="number" name="rating" min="1" max="5" required>
+        </div>
+        <button type="submit">Отправить отзыв</button>
+    </form>
+{% endblock %}

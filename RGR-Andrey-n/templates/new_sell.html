@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Добавить новый объект на продажу</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>Район:</label>
+            <input type="text" name="district" required>
+        </div>
+        <div class="form-group">
+            <label>Площадь (кв.м):</label>
+            <input type="number" step="0.01" name="area" required>
+        </div>
+        <div class="form-group">
+            <label>Цена:</label>
+            <input type="number" step="0.01" name="price" required>
+        </div>
+        <div class="form-group">
+            <label>ID Продавца:</label>
+            <input type="number" name="seller_id" required>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="sold" value="true"> Уже продано
+            </label>
+        </div>
+        <button type="submit">Добавить объект</button>
+    </form>
+{% endblock %}

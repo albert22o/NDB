@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Оформление новой сделки</h2>
+    <form method="POST" style="margin-bottom: 30px; padding: 15px; background: #e9ecef; border-radius: 5px;">
+        <div class="form-group">
+            <label>ID Продавца:</label>
+            <input type="number" name="seller_id" required>
+        </div>
+        <div class="form-group">
+            <label>ID Объекта (будет помечен как проданный):</label>
+            <input type="number" name="building_id" required>
+        </div>
+        <div class="form-group">
+            <label>Фактическая цена продажи:</label>
+            <input type="number" step="0.01" name="actual_sell_price" required>
+        </div>
+        <button type="submit">Оформить сделку</button>
+    </form>
+
+    <h2>История сделок</h2>
+    <table>
+        <tr>
+            <th>ID Заказа</th>
+            <th>Время</th>
+            <th>Продавец</th>
+            <th>Район</th>
+            <th>Площадь</th>
+            <th>Цена продажи</th>
+        </tr>
+        {% for o in orders %}
+        <tr>
+            <td>{{ o.order_id }}</td>
+            <td>{{ o.order_time.strftime('%Y-%m-%d %H:%M') if o.order_time else '' }}</td>
+            <td>{{ o.seller_name }}</td>
+            <td>{{ o.district }}</td>
+            <td>{{ o.area }} кв.м</td>
+            <td>{{ o.actual_sell_price }} руб.</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6">Сделок пока не было.</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

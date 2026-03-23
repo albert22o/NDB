@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Добавить нового продавца</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>ФИО:</label>
+            <input type="text" name="fullName" required>
+        </div>
+        <div class="form-group">
+            <label>Дата рождения:</label>
+            <input type="date" name="dateOfBirth" required>
+        </div>
+        <div class="form-group">
+            <label>Дата регистрации (необязательно):</label>
+            <input type="date" name="dateOfRegistration">
+        </div>
+        <button type="submit">Добавить продавца</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Агентство Недвижимости</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        nav { background: #f4f4f4; padding: 10px; margin-bottom: 20px; border-radius: 5px; }
+        nav a { margin-right: 15px; text-decoration: none; color: #333; font-weight: bold; }
+        nav a:hover { color: #007bff; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .form-group { margin-bottom: 10px; }
+        label { display: block; font-weight: bold; }
+        input[type="text"], input[type="number"], input[type="date"], textarea { width: 100%; max-width: 400px; padding: 8px; }
+        button { padding: 10px 15px; background: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background: #218838; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="{{ url_for('home') }}">Главная</a>
+        <a href="{{ url_for('add_building') }}">Добавить объект</a>
+        <a href="{{ url_for('add_seller') }}">Добавить продавца</a>
+        <a href="{{ url_for('get_orders') }}">Заказы</a>
+        <a href="{{ url_for('get_popular_districts') }}">Популярные районы</a>
+        <a href="{{ url_for('trending') }}">В тренде</a>
+    </nav>
+
+    <div>
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

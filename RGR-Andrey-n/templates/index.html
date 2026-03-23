@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Список объектов недвижимости</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Район</th>
+            <th>Площадь</th>
+            <th>Цена</th>
+            <th>Статус</th>
+            <th>ID Продавца</th>
+            <th>Средний рейтинг</th>
+            <th>Действие</th>
+        </tr>
+        {% for b in buildings %}
+        <tr>
+            <td>{{ b.building_id }}</td>
+            <td>{{ b.district }}</td>
+            <td>{{ b.area }} кв.м</td>
+            <td>{{ b.price }} руб.</td>
+            <td>{{ 'Продано' if b.sold else 'В продаже' }}</td>
+            <td>{{ b.seller_id }}</td>
+            <td>{{ b.avg_rating }} ⭐</td>
+            <td><a href="{{ url_for('building_detail', building_id=b.building_id) }}">Подробнее</a></td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="8">Нет доступных объектов.</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

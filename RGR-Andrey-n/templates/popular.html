@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Популярные районы (по количеству сделок)</h2>
+    <table>
+        <tr>
+            <th>Район</th>
+            <th>Количество проданных объектов</th>
+        </tr>
+        {% for d in districts %}
+        <tr>
+            <td>{{ d.district }}</td>
+            <td>{{ d.total_orders }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="2">Данных пока нет.</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

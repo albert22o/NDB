@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>В тренде (топ-5 по просмотрам)</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Район</th>
+            <th>Площадь</th>
+            <th>Цена</th>
+            <th>Просмотры</th>
+            <th>Действие</th>
+        </tr>
+        {% for b in buildings %}
+        <tr>
+            <td>{{ b.building_id }}</td>
+            <td>{{ b.district }}</td>
+            <td>{{ b.area }} кв.м</td>
+            <td>{{ b.price }} руб.</td>
+            <td><strong>{{ b.views }}</strong></td>
+            <td><a href="{{ url_for('building_detail', building_id=b.building_id) }}">Подробнее</a></td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6">Данных пока нет.</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
