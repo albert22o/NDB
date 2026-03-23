@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Агенты{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>Наши агенты</h1>
+  <p>Команда специалистов агентства</p>
+</div>
+
+<div class="grid grid-2" style="margin-bottom:2.5rem;">
+{% for a in agents %}
+<div class="card">
+  <div style="display:flex;align-items:flex-start;gap:1rem;">
+    <div style="width:52px;height:52px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1.4rem;flex-shrink:0;">
+      {{ a.full_name[0] }}
+    </div>
+    <div style="flex:1;">
+      <h3 style="margin-bottom:.2rem;">{{ a.full_name }}</h3>
+      <p class="muted" style="font-size:.83rem;">📞 {{ a.phone }}</p>
+      <p class="muted" style="font-size:.83rem;">✉️ {{ a.email }}</p>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border);">
+    <div style="text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--gold);">{{ a.properties_count }}</div>
+      <div class="muted" style="font-size:.73rem;">Объектов</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--sage);">{{ a.deals_count }}</div>
+      <div class="muted" style="font-size:.73rem;">Сделок</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--rust);">{{ a.commission_rate }}%</div>
+      <div class="muted" style="font-size:.73rem;">Комиссия</div>
+    </div>
+  </div>
+  <div style="margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--border);">
+    <span style="font-size:.83rem;color:var(--stone);">Заработано: </span>
+    <b>{{ '{:,.0f}'.format(a.earned|float).replace(',', ' ') }} ₽</b>
+    &nbsp;|&nbsp;
+    <span class="muted" style="font-size:.8rem;">с {{ a.hire_date }}</span>
+  </div>
+</div>
+{% endfor %}
+</div>
+
+<!-- ADD AGENT -->
+<div class="section-title">Добавить агента</div>
+<div class="form-section">
+  <h2>Новый сотрудник</h2>
+  <form method="post">
+    <div class="form-row">
+      <div class="form-group" style="grid-column:1/-1;">
+        <label>ФИО</label>
+        <input type="text" name="full_name" required placeholder="Иванов Иван Иванович">
+      </div>
+      <div class="form-group">
+        <label>Телефон</label>
+        <input type="text" name="phone" required placeholder="+7-900-000-0000">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="agent@realty.ru">
+      </div>
+      <div class="form-group">
+        <label>Дата найма</label>
+        <input type="date" name="hire_date" required>
+      </div>
+      <div class="form-group">
+        <label>Комиссия (%)</label>
+        <input type="number" name="commission_rate" step="0.01" min="0" max="100" required placeholder="3.5">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Добавить агента</button>
+  </form>
+</div>
+
+{% endblock %}

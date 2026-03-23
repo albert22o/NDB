@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}EstateHub{% endblock %} — Агентство недвижимости</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:     #1a1814;
+    --stone:   #8a7f72;
+    --cream:   #f5f0e8;
+    --warm:    #e8dece;
+    --gold:    #b89a5a;
+    --gold-lt: #d4b678;
+    --rust:    #c0501e;
+    --sage:    #4a6741;
+    --white:   #fffdf9;
+    --card-bg: #ffffff;
+    --border:  #ddd5c5;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--ink);
+    padding: 0 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+  .nav-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--gold);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    padding: 1rem 0;
+    margin-right: auto;
+  }
+  .nav-brand span { color: var(--gold-lt); font-style: italic; }
+  nav a {
+    color: #c8bfb0;
+    text-decoration: none;
+    padding: 1.1rem 1.1rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color .2s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+  }
+  nav a:hover, nav a.active { color: var(--gold-lt); border-bottom-color: var(--gold-lt); }
+
+  /* ── LAYOUT ── */
+  main { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    border-left: 4px solid var(--gold);
+    padding-left: 1.2rem;
+    margin-bottom: 2.2rem;
+  }
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .page-header p { color: var(--stone); font-size: 0.9rem; margin-top: .3rem; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    transition: box-shadow .2s, transform .15s;
+  }
+  .card:hover { box-shadow: 0 6px 24px rgba(26,24,20,.09); transform: translateY(-2px); }
+  .card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: .5rem;
+  }
+
+  .grid { display: grid; gap: 1.2rem; }
+  .grid-2 { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-block;
+    padding: .18em .65em;
+    border-radius: 2px;
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .badge-available { background: #e6f4e6; color: var(--sage); border: 1px solid #b8d8b8; }
+  .badge-sold      { background: #f4e6e6; color: var(--rust); border: 1px solid #dbb8b8; }
+  .badge-reserved  { background: #f4f0e0; color: #8a6e1a; border: 1px solid #d8cc98; }
+  .badge-apartment { background: #e6ecf4; color: #2a4a6e; border: 1px solid #b8c8d8; }
+  .badge-house     { background: #f0e8f4; color: #4a2a6e; border: 1px solid #c8b8d8; }
+  .badge-commercial{ background: #f4ece6; color: #6e3a1a; border: 1px solid #d8c0b8; }
+  .badge-land      { background: #e8f4e8; color: #1a5a1a; border: 1px solid #b8d8b8; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-block;
+    padding: .55rem 1.4rem;
+    border: none; border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    font-weight: 500;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .2s, transform .1s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--ink); color: var(--gold-lt); }
+  .btn-primary:hover { background: #2d2820; }
+  .btn-gold    { background: var(--gold); color: var(--white); }
+  .btn-gold:hover { background: var(--gold-lt); }
+  .btn-outline { background: transparent; border: 1px solid var(--ink); color: var(--ink); }
+  .btn-outline:hover { background: var(--warm); }
+  .btn-sm { padding: .35rem .9rem; font-size: .75rem; }
+
+  /* ── FORMS ── */
+  .form-section {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.8rem;
+    margin-bottom: 2rem;
+  }
+  .form-section h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: .6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: .35rem; margin-bottom: .9rem; }
+  .form-group label { font-size: .8rem; font-weight: 500; color: var(--stone); letter-spacing: .04em; text-transform: uppercase; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: .6rem .8rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    background: var(--cream);
+    color: var(--ink);
+    transition: border-color .2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: var(--white);
+  }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--ink);
+    color: var(--gold-lt);
+    font-size: .75rem;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: .75rem 1rem;
+    text-align: left;
+  }
+  td { padding: .7rem 1rem; border-bottom: 1px solid var(--border); font-size: .88rem; }
+  tr:hover td { background: var(--cream); }
+
+  /* ── STATS ROW ── */
+  .stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.4rem 1.6rem;
+    text-align: center;
+  }
+  .stat-card .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-card .stat-label {
+    font-size: .78rem;
+    color: var(--stone);
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    margin-top: .35rem;
+  }
+
+  /* ── META PILLS ── */
+  .meta { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin-bottom: .5rem; }
+  .price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .muted { color: var(--stone); font-size: .85rem; }
+
+  /* ── FILTERS ── */
+  .filter-bar {
+    display: flex; gap: .8rem; align-items: center;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: .9rem 1.2rem;
+    margin-bottom: 1.8rem;
+    flex-wrap: wrap;
+  }
+  .filter-bar select, .filter-bar input {
+    padding: .45rem .8rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    background: var(--cream);
+    color: var(--ink);
+  }
+  .filter-bar label { font-size: .8rem; color: var(--stone); font-weight: 500; }
+
+  /* ── DETAIL GRID ── */
+  .detail-grid { display: grid; grid-template-columns: 1fr 320px; gap: 2rem; }
+  .detail-meta { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem 1.5rem; margin: 1rem 0; }
+  .detail-meta dt { font-size: .78rem; color: var(--stone); text-transform: uppercase; letter-spacing: .05em; }
+  .detail-meta dd { font-size: .93rem; font-weight: 500; }
+
+  .sidebar-card {
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 4px;
+    padding: 1.5rem;
+    position: sticky; top: 80px;
+  }
+  .sidebar-card h3 { font-family: 'Cormorant Garamond', serif; color: var(--gold-lt); font-size: 1.2rem; margin-bottom: 1rem; }
+  .sidebar-card .muted { color: #8a8070; }
+
+  /* ── REVIEW ── */
+  .review-card {
+    border-left: 3px solid var(--gold);
+    padding: .8rem 1rem;
+    background: var(--white);
+    border-radius: 0 4px 4px 0;
+    margin-bottom: .8rem;
+  }
+  .stars { color: var(--gold); font-size: 1rem; }
+
+  /* ── DIVIDER ── */
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 2rem 0 1rem;
+    display: flex; align-items: center; gap: .8rem;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  footer {
+    background: var(--ink);
+    color: #6a6055;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: .8rem;
+    margin-top: 4rem;
+    border-top: 2px solid var(--gold);
+  }
+  footer span { color: var(--gold); }
+
+  @media (max-width: 700px) {
+    .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .detail-grid { grid-template-columns: 1fr; }
+    nav { flex-wrap: wrap; padding: .5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/"><span>Estate</span>Hub</a>
+  <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Главная</a>
+  <a href="/properties" {% if '/properties' in request.path %}class="active"{% endif %}>Объекты</a>
+  <a href="/clients" {% if '/clients' in request.path %}class="active"{% endif %}>Клиенты</a>
+  <a href="/agents" {% if '/agents' in request.path %}class="active"{% endif %}>Агенты</a>
+  <a href="/deals" {% if '/deals' in request.path %}class="active"{% endif %}>Сделки</a>
+  <a href="/properties/analytics" {% if 'analytics' in request.path %}class="active"{% endif %}>Аналитика</a>
+</nav>
+<main>
+  {% block content %}{% endblock %}
+</main>
+<footer>
+  &copy; 2026 <span>EstateHub</span> — Агентство недвижимости &nbsp;|&nbsp; РГР по курсу «Сетевые базы данных», Вариант 7
+</footer>
+</body>
+</html>

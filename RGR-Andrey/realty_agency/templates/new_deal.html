@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Новая сделка{% endblock %}
+{% block content %}
+
+<a href="/deals" class="muted" style="font-size:.83rem;text-decoration:none;">← Все сделки</a>
+
+<div class="page-header" style="margin-top:1rem;">
+  <h1>Оформить сделку</h1>
+  <p>Заполните данные для регистрации сделки купли-продажи</p>
+</div>
+
+<div class="form-section">
+  <h2>Параметры сделки</h2>
+  <form method="post" action="/deals/">
+    <div class="form-row">
+      <div class="form-group" style="grid-column:1/-1;">
+        <label>Объект недвижимости (доступные)</label>
+        <select name="property_id" required>
+          <option value="">— выберите объект —</option>
+          {% for p in properties %}
+          <option value="{{ p.id }}">{{ p.title }} — {{ p.address }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Клиент-покупатель</label>
+        <select name="client_id" required>
+          <option value="">— выберите клиента —</option>
+          {% for c in clients %}
+          <option value="{{ c.id }}">{{ c.full_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Агент</label>
+        <select name="agent_id" required>
+          <option value="">— выберите агента —</option>
+          {% for a in agents %}
+          <option value="{{ a.id }}">{{ a.full_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Дата сделки</label>
+        <input type="date" name="deal_date" required value="{{ '' }}">
+      </div>
+      <div class="form-group">
+        <label>Итоговая цена (₽)</label>
+        <input type="number" name="final_price" step="0.01" min="1" required placeholder="4500000">
+      </div>
+    </div>
+
+    <div style="background:var(--warm);border-radius:4px;padding:.9rem 1.1rem;margin-bottom:1.2rem;font-size:.85rem;color:var(--stone);">
+      ℹ️ После оформления сделки статус объекта автоматически сменится на <b>«Продан»</b>.
+      Комиссия агента рассчитывается автоматически на основе его ставки.
+    </div>
+
+    <button type="submit" class="btn btn-gold">✓ Оформить сделку</button>
+    <a href="/deals" class="btn btn-outline" style="margin-left:.5rem;">Отмена</a>
+  </form>
+</div>
+
+{% endblock %}

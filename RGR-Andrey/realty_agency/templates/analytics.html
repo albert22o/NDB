@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Аналитика{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>Аналитика агентства</h1>
+  <p>Сводные данные из PostgreSQL (GROUP BY + JOIN) и MongoDB (Aggregation Pipeline)</p>
+</div>
+
+<!-- By type -->
+<div class="section-title">Объекты по типам (PostgreSQL GROUP BY)</div>
+<div class="grid grid-4" style="margin-bottom:2rem;">
+{% for row in by_type %}
+<div class="card" style="text-align:center;">
+  <div class="badge badge-{{ row.type }}" style="margin-bottom:.7rem;">
+    {% if row.type=='apartment'%}Квартира{% elif row.type=='house'%}Дом{% elif row.type=='commercial'%}Коммерческая{% else %}Земля{% endif %}
+  </div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--gold);">{{ row.cnt }}</div>
+  <div class="muted" style="font-size:.78rem;margin-bottom:.5rem;">объектов</div>
+  <div style="font-size:.85rem;font-weight:500;">
+    ⌀ {{ '{:,.0f}'.format(row.avg_price|float).replace(',', ' ') }} ₽
+  </div>
+  <div class="muted" style="font-size:.75rem;">
+    {{ '{:,.0f}'.format(row.min_price|float).replace(',', ' ') }} — {{ '{:,.0f}'.format(row.max_price|float).replace(',', ' ') }} ₽
+  </div>
+</div>
+{% endfor %}
+</div>
+
+<!-- By agent -->
+<div class="section-title">Производительность агентов (PostgreSQL JOIN + GROUP BY)</div>
+<div class="table-wrap card" style="margin-bottom:2rem;padding:0;overflow:hidden;">
+  <table>
+    <thead>
+      <tr>
+        <th>Агент</th>
+        <th>Объектов</th>
+        <th>Сделок</th>
+        <th>Общая выручка, ₽</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for a in by_agent %}
+    <tr>
+      <td><b>{{ a.full_name }}</b></td>
+      <td>{{ a.properties_count }}</td>
+      <td>
+        {% if a.deals_count > 0 %}
+          <span class="badge badge-available">{{ a.deals_count }}</span>
+        {% else %}
+          <span class="muted">0</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if a.total_revenue %}
+          <b>{{ '{:,.0f}'.format(a.total_revenue|float).replace(',', ' ') }}</b>
+        {% else %}—{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- MongoDB aggregation -->
+<div class="section-title">Топ объектов по рейтингу <span class="muted" style="font-size:.8rem;font-weight:normal;">(MongoDB Aggregation Pipeline)</span></div>
+{% if top_reviewed %}
+<div class="grid grid-3">
+{% for item in top_reviewed %}
+<div class="card" style="text-align:center;">
+  <div class="muted" style="font-size:.78rem;margin-bottom:.4rem;">Объект #{{ item._id }}</div>
+  <div class="stars" style="font-size:1.4rem;">
+    {% set r = item.avg_rating|round(0,'floor')|int %}
+    {% for i in range(r) %}★{% endfor %}{% for i in range(5-r) %}<span style="color:#ccc;">★</span>{% endfor %}
+  </div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold);margin:.4rem 0;">
+    {{ '%.1f'|format(item.avg_rating) }}
+  </div>
+  <div class="muted" style="font-size:.8rem;">{{ item.review_count }} отзыв(ов)</div>
+  <div style="margin-top:.8rem;">
+    <a href="/properties/{{ item._id }}" class="btn btn-outline btn-sm">Перейти</a>
+  </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="card" style="text-align:center;padding:2rem;color:var(--stone);">
+  Отзывов пока нет. Оставьте отзыв на странице любого объекта!
+</div>
+{% endif %}
+
+{% endblock %}

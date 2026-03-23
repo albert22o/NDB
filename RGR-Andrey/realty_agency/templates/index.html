@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+
+<div style="margin-bottom:2.5rem; padding: 2.5rem; background: var(--ink); border-radius:4px; position:relative; overflow:hidden;">
+  <div style="position:absolute;top:0;right:0;width:300px;height:100%;background:linear-gradient(135deg,transparent 60%,rgba(184,154,90,.12));pointer-events:none;"></div>
+  <p style="color:var(--gold);font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.6rem;">Добро пожаловать</p>
+  <h1 style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;color:var(--cream);line-height:1.15;margin-bottom:1rem;">
+    Найдите своё<br><em style="color:var(--gold-lt);">идеальное место</em>
+  </h1>
+  <p style="color:#8a8070;max-width:480px;font-size:.95rem;margin-bottom:1.5rem;">
+    Агентство недвижимости полного цикла — от поиска объекта до оформления сделки.
+  </p>
+  <a href="/properties" class="btn btn-gold">Смотреть объекты →</a>
+  &nbsp;
+  <a href="/deals/new" class="btn btn-outline" style="border-color:#4a4030;color:#c8bfb0;">Оформить сделку</a>
+</div>
+
+<!-- Stats from Redis cache -->
+<div class="grid grid-4" style="margin-bottom:2.5rem;">
+  <div class="stat-card">
+    <div class="stat-num">{{ stats.total_properties }}</div>
+    <div class="stat-label">Объектов в базе</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:var(--sage);">{{ stats.available }}</div>
+    <div class="stat-label">Доступно</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">{{ stats.total_clients }}</div>
+    <div class="stat-label">Клиентов</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" style="color:var(--rust);">{{ stats.total_deals }}</div>
+    <div class="stat-label">Закрытых сделок</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+  <div class="card">
+    <h3>Средняя цена объекта</h3>
+    <p class="price" style="font-size:2rem;margin:.5rem 0;">
+      {{ '{:,.0f}'.format(stats.avg_price|float).replace(',', ' ') }} ₽
+    </p>
+    <p class="muted">По всем объектам в базе</p>
+    <div style="margin-top:1rem;">
+      <a href="/properties/analytics" class="btn btn-outline btn-sm">Подробная аналитика</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Быстрые действия</h3>
+    <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:.8rem;">
+      <a href="/properties?status=available" class="btn btn-primary btn-sm">🏠 Доступные объекты</a>
+      <a href="/deals/new" class="btn btn-gold btn-sm">✍️ Оформить сделку</a>
+      <a href="/clients" class="btn btn-outline btn-sm">👤 Все клиенты</a>
+      <a href="/agents" class="btn btn-outline btn-sm">🤝 Наши агенты</a>
+    </div>
+  </div>
+
+</div>
+
+<p class="muted" style="margin-top:1.5rem;font-size:.78rem;">
+  ℹ️ Статистика кешируется в Redis (TTL 60 сек).
+</p>
+
+{% endblock %}

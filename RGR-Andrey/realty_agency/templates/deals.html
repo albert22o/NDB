@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Сделки{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>История сделок</h1>
+  <p>Все закрытые и текущие сделки агентства</p>
+</div>
+
+<div style="margin-bottom:1.5rem;">
+  <a href="/deals/new" class="btn btn-gold">+ Оформить сделку</a>
+</div>
+
+{% if deals %}
+<div class="table-wrap card" style="padding:0;overflow:hidden;">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Дата</th>
+        <th>Объект</th>
+        <th>Клиент</th>
+        <th>Агент</th>
+        <th>Сумма сделки, ₽</th>
+        <th>Комиссия, ₽</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for d in deals %}
+    <tr>
+      <td class="muted">{{ d.id }}</td>
+      <td>{{ d.deal_date }}</td>
+      <td>
+        <b>{{ d.property_title }}</b><br>
+        <span class="muted" style="font-size:.78rem;">{{ d.address }}</span><br>
+        <span class="badge badge-{{ d.type }}" style="margin-top:.2rem;">
+          {% if d.type=='apartment'%}Квартира{% elif d.type=='house'%}Дом{% elif d.type=='commercial'%}Коммерческая{% else %}Земля{% endif %}
+        </span>
+      </td>
+      <td>{{ d.client_name }}<br><span class="muted" style="font-size:.78rem;">{{ d.client_phone }}</span></td>
+      <td>{{ d.agent_name }}</td>
+      <td style="font-weight:600;">{{ '{:,.0f}'.format(d.final_price|float).replace(',', ' ') }}</td>
+      <td style="color:var(--gold);">{{ '{:,.0f}'.format(d.commission|float).replace(',', ' ') }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card" style="text-align:center;padding:3rem;color:var(--stone);">
+  Сделок пока нет. <a href="/deals/new">Оформить первую сделку</a>
+</div>
+{% endif %}
+
+{% endblock %}

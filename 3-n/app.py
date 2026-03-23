@@ -50,7 +50,20 @@ def car_new():
         cur.close()
         conn.close()
 
-        get_avg_price(brand)
+        key = f"car:{brand}:avg_price"
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM cars.cars WHERE brand = %s", (brand,))
+        cars = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        if cars:
+            avg = sum(float(c[4]) for c in cars) / len(cars)
+        else:
+            avg = 0
+
+        r.setex(key, 2 * 60 * 60, avg)
 
         return redirect(url_for("index"))
     return render_template("car_new.html")
@@ -130,17 +143,12 @@ def get_avg_price(brand_name):
     cached = r.get(key)
     if cached is not None:
         return float(cached)
-
-
-
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("SELECT * FROM cars.cars WHERE brand = %s", (brand_name,))
     cars = cur.fetchall()
     cur.close()
     conn.close()
-
-
 
     if cars:
         avg = sum(float(c[4]) for c in cars) / len(cars)

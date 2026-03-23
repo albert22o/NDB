@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}{{ client.full_name }}{% endblock %}
+{% block content %}
+
+<a href="/clients" class="muted" style="font-size:.83rem;text-decoration:none;">← Все клиенты</a>
+
+<div style="margin-top:1.2rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+  <div class="card">
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.7rem;margin-bottom:.8rem;">
+      {{ client.full_name }}
+    </h2>
+    <dl class="detail-meta">
+      <dt>Телефон</dt>      <dd>{{ client.phone }}</dd>
+      <dt>Email</dt>        <dd>{{ client.email }}</dd>
+      <dt>Бюджет</dt>       <dd>{% if client.budget %}{{ '{:,.0f}'.format(client.budget|float).replace(',', ' ') }} ₽{% else %}не указан{% endif %}</dd>
+      <dt>Зарегистрирован</dt><dd>{{ client.registered_at }}</dd>
+    </dl>
+  </div>
+  <!-- Record view -->
+  <div class="card">
+    <h3>Записать просмотр объекта</h3>
+    <form method="post" action="/clients/{{ client.id }}/view" style="margin-top:.8rem;">
+      <div class="form-group">
+        <label>ID объекта</label>
+        <input type="number" name="property_id" required min="1" placeholder="1">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Записать просмотр (MongoDB)</button>
+    </form>
+  </div>
+</div>
+
+<!-- DEALS -->
+<div class="section-title" style="margin-top:2rem;">История сделок</div>
+{% if deals %}
+<div class="table-wrap card" style="padding:0;overflow:hidden;">
+  <table>
+    <thead>
+      <tr><th>Дата</th><th>Объект</th><th>Агент</th><th>Цена</th><th>Комиссия</th></tr>
+    </thead>
+    <tbody>
+    {% for d in deals %}
+    <tr>
+      <td>{{ d.deal_date }}</td>
+      <td><b>{{ d.property_title }}</b><br><span class="muted" style="font-size:.8rem;">{{ d.address }}</span></td>
+      <td>{{ d.agent_name }}</td>
+      <td>{{ '{:,.0f}'.format(d.final_price|float).replace(',', ' ') }} ₽</td>
+      <td class="muted">{{ '{:,.0f}'.format(d.commission|float).replace(',', ' ') }} ₽</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="muted">Сделок по данному клиенту не было.</p>
+{% endif %}
+
+<!-- VIEW HISTORY from MongoDB -->
+<div class="section-title">История просмотров <span class="muted" style="font-size:.8rem;font-weight:normal;">(MongoDB)</span></div>
+{% if view_history %}
+<div class="table-wrap card" style="padding:0;overflow:hidden;">
+  <table>
+    <thead><tr><th>Дата и время</th><th>ID объекта</th></tr></thead>
+    <tbody>
+    {% for v in view_history %}
+    <tr>
+      <td>{{ v.viewed_at[:19].replace('T', ' ') }}</td>
+      <td><a href="/properties/{{ v.property_id }}">Объект #{{ v.property_id }}</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="muted">Просмотров не зафиксировано.</p>
+{% endif %}
+
+{% endblock %}

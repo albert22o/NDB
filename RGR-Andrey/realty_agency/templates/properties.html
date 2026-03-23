@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Объекты{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>Объекты недвижимости</h1>
+  <p>Полный каталог объектов агентства</p>
+</div>
+
+<!-- FILTERS -->
+<form method="get" class="filter-bar">
+  <label>Тип:</label>
+  <select name="type" onchange="this.form.submit()">
+    <option value="" {% if not filter_type %}selected{% endif %}>Все типы</option>
+    <option value="apartment" {% if filter_type=='apartment' %}selected{% endif %}>Квартира</option>
+    <option value="house"     {% if filter_type=='house' %}selected{% endif %}>Дом</option>
+    <option value="commercial"{% if filter_type=='commercial' %}selected{% endif %}>Коммерческая</option>
+    <option value="land"      {% if filter_type=='land' %}selected{% endif %}>Земля</option>
+  </select>
+  <label>Статус:</label>
+  <select name="status" onchange="this.form.submit()">
+    <option value="" {% if not filter_status %}selected{% endif %}>Все статусы</option>
+    <option value="available" {% if filter_status=='available' %}selected{% endif %}>Доступен</option>
+    <option value="reserved"  {% if filter_status=='reserved' %}selected{% endif %}>Резерв</option>
+    <option value="sold"      {% if filter_status=='sold' %}selected{% endif %}>Продан</option>
+  </select>
+  <span class="muted">{{ properties|length }} объект(ов)</span>
+</form>
+
+<!-- PROPERTY CARDS -->
+<div class="grid grid-2">
+{% for p in properties %}
+<a href="/properties/{{ p.id }}" style="text-decoration:none;color:inherit;">
+<div class="card">
+  <div class="meta">
+    <span class="badge badge-{{ p.type }}">
+      {% if p.type == 'apartment' %}Квартира
+      {% elif p.type == 'house' %}Дом
+      {% elif p.type == 'commercial' %}Коммерческая
+      {% else %}Земля{% endif %}
+    </span>
+    <span class="badge badge-{{ p.status }}">
+      {% if p.status == 'available' %}Доступен
+      {% elif p.status == 'reserved' %}Резерв
+      {% else %}Продан{% endif %}
+    </span>
+  </div>
+  <h3>{{ p.title }}</h3>
+  <p class="muted" style="font-size:.83rem;margin-bottom:.6rem;">📍 {{ p.address }}</p>
+  <div class="price">{{ '{:,.0f}'.format(p.price|float).replace(',', ' ') }} ₽</div>
+  <div style="display:flex;gap:1.2rem;margin:.7rem 0;font-size:.85rem;color:var(--stone);">
+    <span>📐 {{ p.area_sqm }} м²</span>
+    <span>📅 {{ p.listed_at }}</span>
+  </div>
+  <p style="font-size:.83rem;color:var(--stone);">Агент: <b style="color:var(--ink);">{{ p.agent_name }}</b></p>
+</div>
+</a>
+{% else %}
+<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--stone);">
+  Объекты не найдены. <a href="/properties">Сбросить фильтры</a>
+</div>
+{% endfor %}
+</div>
+
+<!-- ADD FORM -->
+<div class="section-title" style="margin-top:3rem;">Добавить объект</div>
+<div class="form-section">
+  <h2>Новый объект недвижимости</h2>
+  <form method="post">
+    <div class="form-row">
+      <div class="form-group" style="grid-column:1/-1;">
+        <label>Название</label>
+        <input type="text" name="title" required placeholder="Двухкомнатная квартира на Ленина">
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label>Адрес</label>
+        <input type="text" name="address" required placeholder="ул. Ленина, 10, кв. 45">
+      </div>
+      <div class="form-group">
+        <label>Тип</label>
+        <select name="type" required>
+          <option value="apartment">Квартира</option>
+          <option value="house">Дом</option>
+          <option value="commercial">Коммерческая</option>
+          <option value="land">Земля</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Площадь (м²)</label>
+        <input type="number" name="area_sqm" step="0.01" required min="0.01" placeholder="54.5">
+      </div>
+      <div class="form-group">
+        <label>Цена (₽)</label>
+        <input type="number" name="price" step="0.01" required min="1" placeholder="4500000">
+      </div>
+      <div class="form-group">
+        <label>Агент</label>
+        <select name="agent_id" required>
+          {% for a in range(1,5) %}<option value="{{ a }}">Агент #{{ a }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label>Описание</label>
+        <textarea name="description" rows="3" placeholder="Дополнительная информация об объекте..."></textarea>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Добавить объект</button>
+  </form>
+</div>
+
+{% endblock %}
