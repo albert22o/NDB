@@ -9,15 +9,19 @@
     <th>Марка</th>
     <th>Цена (₽)</th>
     <th>На складе</th>
+    <th>Есть ли крыша?</th>
+    <th>Средняя цена</th>
     <th></th>
   </tr>
   {% for car in cars %}
   <tr>
-    <td>{{ car[1] }}</td>
-    <td>{{ car[2] }}</td>
-    <td>{{ car[3] }}</td>
-    <td>{{ car[4] }}</td>
-    <td><a href="/cars/{{ car[0] }}">Подробнее</a></td>
+    <td>{{ car["1"] }}</td>
+    <td>{{ car["2"] }}</td>
+    <td>{{ car["3"] }}</td>
+    <td>{{ car["4"] }}</td>
+    <td>{{ car["5"] }}</td>
+      <td>{{ car["6"] }}</td>
+    <td><a href="/cars/{{ car["0"] }}">Подробнее</a></td>
   </tr>
   {% endfor %}
 </table>

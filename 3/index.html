@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Каталог автомобилей — AutoMarket{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+  <h1 style="margin:0">Каталог автомобилей</h1>
+  <div style="display:flex; gap:.75rem;">
+    <a href="{{ url_for('search') }}" class="btn btn-outline">🔍 Поиск</a>
+    <a href="{{ url_for('car_new') }}" class="btn btn-primary">+ Добавить авто</a>
+  </div>
+</div>
+
+{% if cars %}
+<div class="card" style="padding:0; overflow:hidden;">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Марка и модель</th>
+        <th>Цена, ₽</th>
+        <th>На складе</th>
+        <th>Рейтинг</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for car in cars %}
+      <tr>
+        <td class="muted" style="width:40px;">{{ loop.index }}</td>
+        <td>
+          <div style="font-weight:600;">{{ car.brand }} {{ car.name }}</div>
+          {% if car.description %}
+            <div class="muted" style="font-size:.82rem; margin-top:.2rem; max-width:400px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              {{ car.description }}
+            </div>
+          {% endif %}
+        </td>
+        <td style="font-weight:600; white-space:nowrap;">
+          {{ '{:,.0f}'.format(car.price).replace(',', ' ') }}
+        </td>
+        <td>
+          {% if car.stock == 0 %}
+            <span class="badge badge-red">Нет в наличии</span>
+          {% elif car.stock <= 3 %}
+            <span class="badge badge-blue">Осталось {{ car.stock }} шт.</span>
+          {% else %}
+            <span class="badge badge-green">{{ car.stock }} шт.</span>
+          {% endif %}
+        </td>
+        <td>
+          {% set r = ratings.get(car.id) %}
+          {% if r %}
+            <span class="stars small">
+              {% for i in range(1, 6) %}{{ '★' if i <= r|round(0,'ceil')|int else '☆' }}{% endfor %}
+            </span>
+            <span class="muted" style="font-size:.8rem; margin-left:.3rem;">{{ r }}</span>
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </td>
+        <td style="text-align:right;">
+          <a href="{{ url_for('car_detail', product_id=car.id) }}" class="btn btn-outline" style="padding:.35rem .9rem; font-size:.82rem;">
+            Подробнее →
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card" style="text-align:center; padding:3rem;">
+  <p class="muted" style="font-size:1.1rem;">Автомобили ещё не добавлены.</p>
+  <a href="{{ url_for('car_new') }}" class="btn btn-primary" style="margin-top:1rem;">Добавить первый</a>
+</div>
+{% endif %}
+{% endblock %}

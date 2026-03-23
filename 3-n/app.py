@@ -11,10 +11,23 @@ app = Flask(__name__)
 def index():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, name, brand, price, stock FROM cars.cars")
-    cars = cur.fetchall()
+    cur.execute("SELECT id, name, brand, price, stock, roof FROM cars.cars")
+    rows = cur.fetchall()
     cur.close()
     conn.close()
+    cars = []
+    for row in rows:
+        cars.append(
+            {"0": row[0],
+             "1": row[1],
+             "2": row[2],
+             "3": row[3],
+             "4": row[4],
+             "5": row[5],
+             "6": get_avg_price(row[2])
+             })
+
+
     return render_template("index.html", cars=cars)
 
 
@@ -26,15 +39,19 @@ def car_new():
         description = request.form["description"]
         price = request.form["price"]
         stock = request.form["stock"]
+        has_roof = True if request.form.get("hasroof") == "on" else False
         conn = get_connection()
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO cars.cars (name, brand, description, price, stock) VALUES (%s, %s, %s, %s, %s)",
-            (name, brand, description, price, stock)
+            "INSERT INTO cars.cars (name, brand, description, price, stock, roof) VALUES (%s, %s, %s, %s, %s, %s)",
+            (name, brand, description, price, stock, has_roof)
         )
         conn.commit()
         cur.close()
         conn.close()
+
+        get_avg_price(brand)
+
         return redirect(url_for("index"))
     return render_template("car_new.html")
 
@@ -67,9 +84,12 @@ def car_detail(product_id):
 
 @app.route("/popular")
 def popular():
-    top = r.zrevrange("popular:cars", 0, 9, withscores=True)
+    top = r.zrevrange("popular:cars", 0, 3, withscores=True)
+
+    badtop = r.zrange("popular:cars", 0, 3, withscores=True)
 
     cars = []
+    badcars = []
     conn = get_connection()
     cur = conn.cursor()
     for car_id, views in top:
@@ -78,9 +98,17 @@ def popular():
         if row:
             cars.append({"id": row[0], "name": row[1], "brand": row[2],
                          "price": row[3], "views": int(views)})
+
+    for car_id, views in badtop:
+        cur.execute("SELECT id, name, brand, price FROM cars.cars WHERE id = %s", (int(car_id),))
+        row = cur.fetchone()
+        if row:
+            badcars.append({"id": row[0], "name": row[1], "brand": row[2],
+                         "price": row[3], "views": int(views)})
+
     cur.close()
     conn.close()
-    return render_template("popular.html", cars=cars)
+    return render_template("popular.html", cars=cars, badcars=badcars)
 
 def get_avg_rating(product_id):
     key = f"car:{product_id}:avg_rating"
@@ -95,6 +123,31 @@ def get_avg_rating(product_id):
         avg = 0
 
     r.setex(key, 3600, avg)
+    return round(avg, 1)
+
+def get_avg_price(brand_name):
+    key = f"car:{brand_name}:avg_price"
+    cached = r.get(key)
+    if cached is not None:
+        return float(cached)
+
+
+
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM cars.cars WHERE brand = %s", (brand_name,))
+    cars = cur.fetchall()
+    cur.close()
+    conn.close()
+
+
+
+    if cars:
+        avg = sum(float(c[4]) for c in cars) / len(cars)
+    else:
+        avg = 0
+
+    r.setex(key, 2 * 60 * 60, avg)
     return round(avg, 1)
 
 @app.route("/search", methods=["GET", "POST"])

@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  # ── Базы данных ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       carshop
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # ── Flask-приложение ─────────────────────────────────────────────────────────
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/carshop
+      MONGO_URL:    mongodb://mongo:27017/
+      SECRET_KEY:   change-me-in-production
+      FLASK_APP:    app.py
+    depends_on:
+      - postgres
+      - mongo
+    command: >
+      sh -c "flask init-db && flask run --host=0.0.0.0"
+
+volumes:
+  pg_data:
+  mongo_data:

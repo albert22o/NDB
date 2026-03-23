@@ -9,13 +9,15 @@ db.dealers.aggregate([
   },
   {
     $project: {
-      name: 1,
-      address: 1,
-      rating: 1, 
+      _id: 1,
       average_auction_score: { $avg: "$cars.auction_evaluation" }
     }
   },
   {
-    $out: "dealers"
+    $merge: {
+  into: 'dealers',
+  on: '_id',
+  whenMatched: 'merge'
+}
   }
 ]);

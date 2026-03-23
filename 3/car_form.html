@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Добавить автомобиль — AutoMarket{% endblock %}
+
+{% block content %}
+
+<div class="muted" style="margin-bottom:1.2rem; font-size:.88rem;">
+  <a href="{{ url_for('index') }}" style="color:var(--muted); text-decoration:none;">Каталог</a>
+  &nbsp;/&nbsp; Добавить автомобиль
+</div>
+
+<h1>Добавить автомобиль</h1>
+
+<div class="card" style="max-width:640px;">
+  <form method="POST" action="{{ url_for('car_new') }}">
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div class="form-group">
+        <label for="brand">Марка <span style="color:var(--danger);">*</span></label>
+        <input type="text" id="brand" name="brand"
+               value="{{ form_data.get('brand','') }}"
+               placeholder="Toyota" maxlength="20" required>
+      </div>
+      <div class="form-group">
+        <label for="name">Модель <span style="color:var(--danger);">*</span></label>
+        <input type="text" id="name" name="name"
+               value="{{ form_data.get('name','') }}"
+               placeholder="Camry" maxlength="20" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Описание</label>
+      <textarea id="description" name="description"
+                placeholder="Краткое описание автомобиля…">{{ form_data.get('description','') }}</textarea>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div class="form-group">
+        <label for="price">Цена, ₽ <span style="color:var(--danger);">*</span></label>
+        <input type="number" id="price" name="price"
+               value="{{ form_data.get('price','') }}"
+               placeholder="2500000" min="1" step="1" required>
+      </div>
+      <div class="form-group">
+        <label for="stock">Количество на складе <span style="color:var(--danger);">*</span></label>
+        <input type="number" id="stock" name="stock"
+               value="{{ form_data.get('stock','0') }}"
+               placeholder="5" min="0" step="1" required>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:.75rem; margin-top:.5rem;">
+      <button type="submit" class="btn btn-primary">Сохранить автомобиль</button>
+      <a href="{{ url_for('index') }}" class="btn btn-outline">Отмена</a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

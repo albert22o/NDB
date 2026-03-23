@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}{{ car.brand }} {{ car.name }} — AutoMarket{% endblock %}
+
+{% block content %}
+
+{# ── Breadcrumb ── #}
+<div class="muted" style="margin-bottom:1.2rem; font-size:.88rem;">
+  <a href="{{ url_for('index') }}" style="color:var(--muted); text-decoration:none;">Каталог</a>
+  &nbsp;/&nbsp; {{ car.brand }} {{ car.name }}
+</div>
+
+{# ── Car card ── #}
+<div class="card" style="margin-bottom:2rem;">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <div class="muted" style="font-size:.85rem; text-transform:uppercase; letter-spacing:.5px; margin-bottom:.3rem;">
+        {{ car.brand }}
+      </div>
+      <h1 style="margin:0; font-size:2rem;">{{ car.name }}</h1>
+      {% if avg_rating %}
+        <div style="margin-top:.5rem; display:flex; align-items:center; gap:.5rem;">
+          <span class="stars">
+            {% for i in range(1, 6) %}{{ '★' if i <= avg_rating|round(0,'ceil')|int else '☆' }}{% endfor %}
+          </span>
+          <span style="font-size:1.1rem; font-weight:600;">{{ avg_rating }}</span>
+          <span class="muted" style="font-size:.85rem;">({{ comments|length }} отз.)</span>
+        </div>
+      {% else %}
+        <div class="muted" style="margin-top:.4rem; font-size:.9rem;">Нет оценок</div>
+      {% endif %}
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:2rem; font-weight:700; color:var(--accent);">
+        {{ '{:,.0f}'.format(car.price).replace(',', ' ') }} ₽
+      </div>
+      <div style="margin-top:.3rem;">
+        {% if car.stock == 0 %}
+          <span class="badge badge-red">Нет в наличии</span>
+        {% elif car.stock <= 3 %}
+          <span class="badge badge-blue">Осталось {{ car.stock }} шт.</span>
+        {% else %}
+          <span class="badge badge-green">В наличии: {{ car.stock }} шт.</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if car.description %}
+    <hr>
+    <p style="line-height:1.7; color:#c8cfe6;">{{ car.description }}</p>
+  {% endif %}
+</div>
+
+{# ── Comments ── #}
+<h2>Отзывы {% if comments %}<span class="muted" style="font-weight:400; font-size:.9rem;">({{ comments|length }})</span>{% endif %}</h2>
+
+{% if comments %}
+  <div style="display:flex; flex-direction:column; gap:.85rem; margin-bottom:2rem;">
+    {% for c in comments %}
+    <div class="card" style="padding:1rem 1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem;">
+        <div style="display:flex; align-items:center; gap:.75rem;">
+          <div style="width:34px; height:34px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.85rem;">
+            {{ c.author[0]|upper }}
+          </div>
+          <span style="font-weight:600;">{{ c.author }}</span>
+          <span class="stars small">
+            {% for i in range(1, 6) %}{{ '★' if i <= c.rating else '☆' }}{% endfor %}
+          </span>
+        </div>
+        <span class="muted" style="font-size:.8rem;">
+          {{ c.created_at.strftime('%d.%m.%Y %H:%M') }}
+        </span>
+      </div>
+      <p style="margin:0; color:#c8cfe6; font-size:.93rem;">{{ c.text }}</p>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="muted" style="margin-bottom:2rem;">Пока нет отзывов. Будьте первым!</p>
+{% endif %}
+
+{# ── Add comment form ── #}
+<div class="card">
+  <h2 style="margin-bottom:1.25rem;">Оставить отзыв</h2>
+  <form method="POST" action="{{ url_for('car_detail', product_id=car.id) }}">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div class="form-group">
+        <label for="author">Ваше имя <span class="muted">(необязательно)</span></label>
+        <input type="text" id="author" name="author" placeholder="Аноним" maxlength="50">
+      </div>
+      <div class="form-group">
+        <label for="rating">Оценка <span style="color:var(--danger);">*</span></label>
+        <select id="rating" name="rating" required>
+          <option value="" disabled selected>Выберите оценку</option>
+          {% for v, label in [(5,'★★★★★ — Отлично'),(4,'★★★★☆ — Хорошо'),(3,'★★★☆☆ — Нормально'),(2,'★★☆☆☆ — Плохо'),(1,'★☆☆☆☆ — Ужасно')] %}
+            <option value="{{ v }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="text">Текст отзыва <span style="color:var(--danger);">*</span></label>
+      <textarea id="text" name="text" placeholder="Поделитесь впечатлениями об автомобиле…" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Отправить отзыв</button>
+  </form>
+</div>
+
+{% endblock %}

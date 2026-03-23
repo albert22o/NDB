@@ -1,0 +1,27 @@
+db.sales.aggregate([
+      {
+    $group: {
+      _id: { 
+        brand: "$brand"
+      },
+      owners: { 
+        $addToSet:{ 
+        $cond: {
+          if: { $eq: [{ $type: "$owner" }, "string"] }, 
+            then: owner,
+            else: {
+                $concat: ["$owner.name", " ",  "$owner.email" ] 
+            }
+        }
+      }
+    }
+    }
+  },
+    {
+    $project: {
+      _id: 0,
+      name: "$_id",
+      owners: "$owners"
+    }
+  }
+])
