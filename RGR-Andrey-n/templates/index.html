@@ -6,6 +6,7 @@
         <tr>
             <th>ID</th>
             <th>Район</th>
+            <th>Адрес</th>
             <th>Площадь</th>
             <th>Цена</th>
             <th>Статус</th>
@@ -17,6 +18,7 @@
         <tr>
             <td>{{ b.building_id }}</td>
             <td>{{ b.district }}</td>
+            <td>{{ b.address }}</td>
             <td>{{ b.area }} кв.м</td>
             <td>{{ b.price }} руб.</td>
             <td>{{ 'Продано' if b.sold else 'В продаже' }}</td>
@@ -26,7 +28,7 @@
         </tr>
         {% else %}
         <tr>
-            <td colspan="8">Нет доступных объектов.</td>
+            <td colspan="9">Нет доступных объектов.</td>
         </tr>
         {% endfor %}
     </table>

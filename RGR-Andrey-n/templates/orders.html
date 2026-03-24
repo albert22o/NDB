@@ -4,12 +4,13 @@
     <h2>Оформление новой сделки</h2>
     <form method="POST" style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px;">
         <div class="form-group">
-            <label>ID Продавца:</label>
-            <input type="number" name="seller_id" placeholder="Например: 1" required>
-        </div>
-        <div class="form-group">
-            <label>ID Объекта (будет помечен как проданный):</label>
-            <input type="number" name="building_id" placeholder="Например: 10" required>
+            <label>ID объекта:</label>
+            <select name="building_id" required>
+                <option value="" disabled selected>Выберите Id</option>
+                {% for building in buildings %}
+                    <option value="{{ building.building_id }}">{{ building.building_id }}</option>
+                {% endfor %}
+            </select>
         </div>
         <div class="form-group">
             <label>Фактическая цена продажи:</label>
@@ -35,7 +36,6 @@
             <tr>
                 <td><strong>#{{ o.order_id }}</strong></td>
                 <td>
-                    {# Проверяем, является ли order_time объектом datetime #}
                     {% if o.order_time and o.order_time.strftime %}
                         {{ o.order_time.strftime('%d.%m.%Y %H:%M') }}
                     {% else %}

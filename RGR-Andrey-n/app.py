@@ -13,7 +13,7 @@ def home():
     conn = get_connection()
     try:
         cur = conn.cursor()
-        cur.execute("SELECT building_id, area, price, sold, district, seller_id FROM agents.buildings")
+        cur.execute("SELECT building_id, area, price, sold, district, seller_id, address FROM agents.buildings")
         rows = cur.fetchall()
         cur.close()
         conn.close()
@@ -26,6 +26,7 @@ def home():
                 "sold": row[3],
                 "district": row[4],
                 "seller_id": row[5],
+                "address": row[6],
                 "avg_rating": get_avg_rating(row[0]),
             })
     except Exception as e:
@@ -34,7 +35,6 @@ def home():
 
 
     return render_template("index.html", buildings=buildings)
-
 
 @app.route("/building/<int:building_id>", methods=["GET", "POST"])
 def building_detail(building_id):
@@ -82,23 +82,23 @@ def building_detail(building_id):
         return redirect(url_for("home"))
     return render_template("building_detail.html", building=building, reviews=reviews)
 
-
 @app.route("/sell", methods=["GET", "POST"])
 def add_building():
     if request.method == "POST":
         area = request.form["area"]
         price = request.form["price"]
-        sold = True if request.form.get("sold") else False
+        sold = False
         district = request.form["district"]
         seller_id = request.form["seller_id"]
+        address = request.form["address"]
 
         conn = get_connection()
         try:
             cur = conn.cursor()
             cur.execute(
-                """INSERT INTO agents.buildings (area, price, sold, district, seller_id)
-                   VALUES (%s, %s, %s, %s, %s)""",
-                (area, price, sold, district, seller_id)
+                """INSERT INTO agents.buildings (area, price, sold, district, seller_id, address)
+                   VALUES (%s, %s, %s, %s, %s, %s)""",
+                (area, price, sold, district, seller_id, address)
             )
             conn.commit()
             cur.close()
@@ -109,9 +109,25 @@ def add_building():
         r.delete("cache:popular_districts")
 
         return redirect(url_for("home"))
+    conn = get_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute('SELECT seller_id, "fullName" FROM agents.sellers')
+        rows = cur.fetchall()
+        cur.close()
 
-    return render_template("new_sell.html")
-
+        sellers = [
+            {
+                "seller_id": row[0],
+                "full_name": row[1]
+            }
+            for row in rows
+        ]
+    except Exception as e:
+        conn.rollback()
+        sellers = []
+    conn.close()
+    return render_template("new_sell.html", sellers=sellers)
 
 @app.route("/add_seller", methods=["GET", "POST"])
 def add_seller():
@@ -130,7 +146,6 @@ def add_seller():
             )
             conn.commit()
             cur.close()
-            conn.close()
             sellers_collection.insert_one({
                 "fullName": full_name,
                 "dateOfBirth": date_of_birth,
@@ -141,8 +156,8 @@ def add_seller():
         except Exception as e:
             conn.rollback()
             flash(f"Произошла ошибка: {e}", "danger")
+        conn.close()
     return render_template("new_seller.html")
-
 
 @app.route("/popular", methods=["GET"])
 def get_popular_districts():
@@ -202,7 +217,6 @@ def trending():
     return render_template("trending.html", buildings=buildings)
 
 
-
 @app.route("/orders", methods=["GET", "POST"])
 def get_orders():
     conn = get_connection()
@@ -210,54 +224,74 @@ def get_orders():
         cur = conn.cursor()
 
         if request.method == "POST":
-            seller_id = request.form["seller_id"]
             building_id = request.form["building_id"]
             actual_sell_price = request.form["actual_sell_price"]
 
             cur.execute(
-                """INSERT INTO agents.orders (seller_id, building_id, actual_sell_price)
-                   VALUES (%s, %s, %s)""",
-                (seller_id, building_id, actual_sell_price)
-            )
-            cur.execute(
-                "UPDATE agents.buildings SET sold = TRUE WHERE building_id = %s",
+                "SELECT seller_id FROM agents.buildings WHERE building_id = %s",
                 (building_id,)
             )
-            conn.commit()
+            res = cur.fetchone()
 
-            r.delete("cache:popular_districts")
+            if res:
+                seller_id = res[0]
+                cur.execute(
+                    """INSERT INTO agents.orders (seller_id, building_id, actual_sell_price)
+                       VALUES (%s, %s, %s)""",
+                    (seller_id, building_id, actual_sell_price)
+                )
+                cur.execute(
+                    "UPDATE agents.buildings SET sold = TRUE WHERE building_id = %s",
+                    (building_id,)
+                )
+                conn.commit()
+                r.delete("cache:popular_districts")
+                flash("Сделка успешно оформлена!", "success")
+            else:
+                flash("Ошибка: Здание не найдено", "danger")
+
+        cur.execute('SELECT building_id, address, area FROM agents.buildings WHERE sold = FALSE')
+        rows = cur.fetchall()
+        buildings = [
+            {"building_id": row[0], "address": row[1], "area": row[2]}
+            for row in rows
+        ]
 
         cur.execute("""
-            SELECT o.order_id, s."fullName", b.district, b.area,
-                   o.actual_sell_price, o."orderTime"
-            FROM agents.orders o
-            JOIN agents.sellers s ON o.seller_id = s.seller_id
-            JOIN  agents.buildings b ON o.building_id = b.building_id
-            ORDER BY o."orderTime" DESC
-        """)
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
-
+                    SELECT o.order_id,
+                           s."fullName",
+                           b.address,
+                           b.district,
+                           o.actual_sell_price,
+                           o."orderTime"
+                    FROM agents.orders o
+                             JOIN agents.sellers s ON o.seller_id = s.seller_id
+                             JOIN agents.buildings b ON o.building_id = b.building_id
+                    ORDER BY o."orderTime" DESC
+                    """)
+        order_rows = cur.fetchall()
         orders = [
             {
                 "order_id": row[0],
                 "seller_name": row[1],
-                "district": row[2],
-                "area": row[3],
+                "address": row[2],
+                "district": row[3],
                 "actual_sell_price": row[4],
                 "order_time": row[5],
             }
-            for row in rows
+            for row in order_rows
         ]
+
+        cur.close()
+        conn.close()
+
     except Exception as e:
-        conn.rollback()
-        return 404, f"Произошла ошибка: {e}", "danger"
+        if conn:
+            conn.rollback()
+        flash(f"Произошла ошибка: {e}", "danger")
+        return redirect(url_for("home"))
 
-    return render_template("orders.html", orders=orders)
-
-
-
+    return render_template("orders.html", orders=orders, buildings=buildings)
 def get_avg_rating(building_id):
     key = f"building:{building_id}:avg_rating"
     cached = r.get(key)
