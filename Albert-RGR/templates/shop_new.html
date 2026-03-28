@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Добавить магазин{% endblock %}
+{% block content %}
+<h1>Добавить магазин</h1>
+
+<form method="POST">
+  <label>Название *
+    <input type="text" name="name" maxlength="20" required/>
+  </label>
+  <label>Адрес *
+    <input type="text" name="address" maxlength="20" required/>
+  </label>
+  <label>Дата регистрации *
+    <input type="date" name="registration_date" required/>
+  </label>
+  <button type="submit">Добавить</button>
+  <a href="/">Отмена</a>
+</form>
+{% endblock %}

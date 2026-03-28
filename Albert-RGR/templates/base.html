@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    nav { margin-bottom: 30px; }
+    nav a { margin-right: 15px; }
+    h1 { margin-bottom: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
+    th { background: #f0f0f0; }
+    input, textarea, select { display: block; width: 100%; padding: 6px; margin-top: 4px; box-sizing: border-box; }
+    label { margin-top: 12px; display: block; font-weight: bold; }
+    button, .btn { padding: 8px 18px; margin-top: 16px; cursor: pointer; }
+  </style>
+    <title>Конкретная канцелярия</title>
+</head>
+<body>
+  <nav>
+    <a href="/">Главная</a>
+    <a href="/stationary/new">Добавить канцелярию</a>
+    <a href="/search">Поиск</a>
+    <a href="/popular">Популярные</a>
+    <a href="/shops">Магазины</a>
+    <a href="/shop/new">Добавить магазин</a>
+    <a href="/order/new">Новая продажа</a>
+    <a href="/orders">Заказы</a>
+  </nav>
+  {% block content %}{% endblock %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+</body>
+</html>

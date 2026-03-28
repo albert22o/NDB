@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Популярные{% endblock %}
+{% block content %}
+<h1>Популярные канцелярия</h1>
+
+{% if stationaries%}
+<table>
+  <tr>
+    <th>#</th>
+    <th>Название</th>
+    <th>Марка</th>
+    <th>Цена (₽)</th>
+    <th>Просмотров</th>
+    <th></th>
+  </tr>
+  {% for stationary in stationaries %}
+  <tr>
+    <td>{{ loop.index }}</td>
+    <td>{{ stationary.name }}</td>
+    <td>{{ stationary.brand }}</td>
+    <td>{{ stationary.price }}</td>
+    <td>{{ stationary.views }}</td>
+    <td><a href="/stationary/{{ stationary.id }}">Подробнее</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Пока никто не смотрел канцелярию.</p>
+{% endif %}
+<h1>Непопулярная канцелярия</h1>
+
+{% if badstationaries%}
+<table>
+  <tr>
+    <th>#</th>
+    <th>Название</th>
+    <th>Бренд</th>
+    <th>Цена (₽)</th>
+    <th>Просмотров</th>
+    <th></th>
+  </tr>
+  {% for stationary in badstationaries %}
+  <tr>
+    <td>{{ loop.index }}</td>
+    <td>{{ stationary.name }}</td>
+    <td>{{ stationary.brand }}</td>
+    <td>{{ stationary.price }}</td>
+    <td>{{ stationary.views }}</td>
+    <td><a href="/stationary/{{ stationary.id }}">Подробнее</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+{% endif %}
+{% endblock %}

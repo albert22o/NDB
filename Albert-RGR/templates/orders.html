@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Заказы</h1>
+
+{% if orders %}
+<table>
+  <tr>
+    <th>Продукт</th>
+    <th>Дата заказа</th>
+    <th>Количество</th>
+  </tr>
+  {% for order in orders %}
+  <tr>
+    <td>{{ order["0"] }}</td>
+    <td>{{ order["1"] }}</td>
+    <td>{{ order["2"] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Заказов пока нет. <a href="/order/new">Добавить первый</a>.</p>
+{% endif %}
+{% endblock %}

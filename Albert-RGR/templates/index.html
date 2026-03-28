@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Канцелярия</h1>
+
+{% if stationaries %}
+<table>
+  <tr>
+    <th>Название</th>
+    <th>Бренд</th>
+    <th>Цена (₽)</th>
+    <th>На складе</th>
+    <th>Средняя цена у бренда</th>
+    <th></th>
+  </tr>
+  {% for stationary in stationaries %}
+  <tr>
+    <td>{{ stationary["1"] }}</td>
+    <td>{{ stationary["2"] }}</td>
+    <td>{{ stationary["3"] }}</td>
+    <td>{{ stationary["4"] }}</td>
+    <td>{{ stationary["5"] }}</td>
+    <td><a href="/stationary/{{ stationary["0"] }}">Подробнее</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Канцелярии пока нет. <a href="/stationary/new">Добавить первый</a>.</p>
+{% endif %}
+{% endblock %}

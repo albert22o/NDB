@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Магазины</h1>
+
+{% if shops %}
+<table>
+  <tr>
+    <th>Название</th>
+    <th>Адрес</th>
+    <th>Дата регистрации</th>
+  </tr>
+  {% for shop in shops %}
+  <tr>
+    <td>{{ shop["0"] }}</td>
+    <td>{{ shop["1"] }}</td>
+    <td>{{ shop["2"] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Магазинов пока нет. <a href="/shop/new">Добавить первый</a>.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ stationary[1] }}{% endblock %}
+{% block content %}
+
+<a href="/">← Назад</a>
+<h1>{{ stationary[2] }} ({{ stationary[6] }})</h1>
+<p>{{ stationary[3] }}</p>
+<p><b>Цена:</b> {{ stationary[1] }} ₽</p>
+<p><b>На складе:</b> {{ stationary[4] }} шт.</p>
+
+<hr/>
+<h2>Отзывы</h2>
+
+{% if comments %}
+  {% for c in comments %}
+  <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+    <b>{{ c.author }}</b> — {{ c.rating }}/5
+    <br/>{{ c.text }}
+    <br/><small>{{ c.created_at.strftime('%d.%m.%Y %H:%M') if c.created_at else '' }}</small>
+  </div>
+  {% endfor %}
+{% else %}
+  <p>Отзывов пока нет.</p>
+{% endif %}
+
+<h2>Оставить отзыв</h2>
+<form method="POST">
+  <label>Автор
+    <input type="text" name="author" placeholder="Аноним"/>
+  </label>
+  <label>Оценка *
+    <select name="rating" required>
+      <option value="5">5 — Отлично</option>
+      <option value="4">4 — Хорошо</option>
+      <option value="3">3 — Нормально</option>
+      <option value="2">2 — Плохо</option>
+      <option value="1">1 — Ужасно</option>
+    </select>
+  </label>
+  <label>Текст *
+    <textarea name="text" required></textarea>
+  </label>
+  <button type="submit">Отправить</button>
+</form>
+{% endblock %}

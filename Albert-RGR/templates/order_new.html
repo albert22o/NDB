@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Заказать продукт{% endblock %}
+{% block content %}
+<h1>Новый заказ</h1>
+
+<form method="POST">
+    <label>Продукт:</label>
+    <select name="stationary_id" required>
+        <option value="" disabled selected>Выберите продукт</option>
+        {% for stationary in stationaries %}
+            <option value="{{ stationary.id }}">{{ stationary.name }}</option>
+        {% endfor %}
+    </select>
+  <label>Количество *
+    <input type="number" name="amount" maxlength="20" required/>
+  </label>
+  <label>Дата сделки *
+    <input type="date" name="date_of_order" required/>
+  </label>
+  <button type="submit">Добавить</button>
+  <a href="/">Отмена</a>
+</form>
+{% endblock %}
