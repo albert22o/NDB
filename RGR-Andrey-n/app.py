@@ -250,7 +250,7 @@ def get_orders():
             else:
                 flash("Ошибка: Здание не найдено", "danger")
 
-        cur.execute('SELECT building_id, address, area FROM agents.buildings WHERE sold = FALSE')
+        cur.execute('SELECT building_id, address, area FROM agents.buildings')
         rows = cur.fetchall()
         buildings = [
             {"building_id": row[0], "address": row[1], "area": row[2]}
@@ -263,7 +263,8 @@ def get_orders():
                            b.address,
                            b.district,
                            o.actual_sell_price,
-                           o."orderTime"
+                           o."orderTime",
+                           b.area
                     FROM agents.orders o
                              JOIN agents.sellers s ON o.seller_id = s.seller_id
                              JOIN agents.buildings b ON o.building_id = b.building_id
@@ -278,6 +279,7 @@ def get_orders():
                 "district": row[3],
                 "actual_sell_price": row[4],
                 "order_time": row[5],
+                "area" : row[6]
             }
             for row in order_rows
         ]
